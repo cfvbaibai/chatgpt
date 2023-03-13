@@ -1,7 +1,4 @@
 import openai
-import os
-
-os.environ["HTTPS_PROXY"] = "http://127.0.0.1:7078"
 
 response = openai.ChatCompletion.create(
     model="gpt-3.5-turbo",
