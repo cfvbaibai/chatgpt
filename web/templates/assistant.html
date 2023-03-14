@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MCHR AI</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+        }
+        html, body {
+            height: 100%;
+            width: 100%;
+            padding: 0;
+            margin: 0;
+            font-family: 微软雅黑, Consolas;
+            font-size: 14px;
+        }
+        div.root {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            padding: 16px;
+            gap: 16px;
+        }
+        div.title {
+            font-size: 24px;
+        }
+        input {
+            width: 400px;
+        }
+        div#messages {
+            width: 100%;
+            flex: 1;
+            background-color: #ccc;
+
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            overflow: auto;
+            padding: 16px;
+        }
+        div#messages > div {
+            width: 100%;
+            background-color: #fff;
+            padding: 8px;
+        }
+        div.user > span, div.question > span {
+            display: inline-block;
+            width: 100px;
+        }
+    </style>
+</head>
+<body>
+<div class="root">
+    <div class="title">智能助理</div>
+    <div><a href="javascript:history.go(-1)">返回</a></div>
+    <div class="user">
+        <span>您的名字：</span>
+        <input id="u" value="anonymous"/>
+    </div>
+    <div class="question">
+        <span>问题：</span>
+        <input id="q" value="请问如何办理上海市的居住证？"/>
+        <button id="ask-button">提交</button>
+    </div>
+    <div id="messages">
+    </div>
+</div>
+<script>
+    function addMessageDiv(message) {
+        const messageDiv = document.createElement("div");
+        messageDiv.innerText = message;
+        document.querySelector("#messages").appendChild(messageDiv);
+        return messageDiv;
+    }
+
+    document.querySelector("#ask-button").addEventListener("click", async () => {
+        const key = document.querySelector("#u").value;
+        const q = document.querySelector("#q").value;
+        if (!q) { return; }
+        addMessageDiv("问：" + q);
+        const button = document.querySelector("#ask-button");
+        button.disabled = true;
+        button.innerText = '正在提交……';
+        const answerDiv = addMessageDiv("智能助手正在查找资料，可能会花费数十秒钟，请耐心等待……");
+        answerDiv.style.color = "#999";
+        try {
+            const response = await fetch("/api/assistant/ask", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ key, q })
+            });
+            const responseObj = await response.json();
+            if (responseObj.error) {
+                throw Error(responseObj.error);
+            }
+            const answer = responseObj.data.final_a;
+            answerDiv.innerText = "答：" + answer;
+            answerDiv.style.color = "inherit";
+        } catch (e) {
+            answerDiv.innerText = "错误：" + e.message;
+            answerDiv.style.color = "red";
+        } finally {
+            button.disabled = false;
+            button.innerText = '提交';
+        }
+    });
+
+</script>
+</body>
+</html>

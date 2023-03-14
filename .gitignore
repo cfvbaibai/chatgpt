@@ -103,6 +103,7 @@ celerybeat.pid
 
 # Environments
 env.sh
+env.bat
 .venv
 env/
 venv/
