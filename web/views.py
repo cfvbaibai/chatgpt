@@ -1,11 +1,7 @@
-import random
-import string
-
-from flask import Flask, render_template, session, request
+from flask import render_template, request
 
 from chat.dialog import Dialog
-
-app = Flask(__name__)
+from web import app
 
 SESSION_ASSISTANT_DIALOG = "assistant_dialog"
 
