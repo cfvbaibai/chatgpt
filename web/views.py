@@ -1,7 +1,9 @@
-from flask import render_template, request
+from flask import render_template, request, Flask
 
 from chat.dialog import Dialog
-from web import app
+
+app = Flask(__name__, static_folder='static')
+app.url_map.strict_slashes = False
 
 SESSION_ASSISTANT_DIALOG = "assistant_dialog"
 
