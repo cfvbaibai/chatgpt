@@ -24,7 +24,7 @@
             height: 100%;
             overflow: hidden;
             padding: 16px;
-            gap: 16px;
+            gap: 8px;
         }
         div.title {
             font-size: 24px;
@@ -55,6 +55,7 @@
         div.user, div.question {
             display: flex;
             width: 100%;
+            gap: 8px;
         }
         div.user > div.label, div.question > div.label {
             display: inline-block;
@@ -74,11 +75,10 @@
 </head>
 <body>
 <div class="root">
-    <div class="title">智能助理</div>
-    <div><a href="javascript:history.go(-1)">返回</a></div>
     <div class="user">
         <div class="label">您的名字：</div>
         <input id="u" value="anonymous"/>
+        <div><a href="javascript:history.go(-1)">返回</a></div>
     </div>
     <textarea id="q">请问如何办理上海市的居住证？</textarea>
     <button id="ask-button">提交</button>
