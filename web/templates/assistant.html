@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>MCHR AI</title>
     <style>
         * {
@@ -31,6 +32,10 @@
         input {
             width: 400px;
         }
+        div#q {
+            width: 100%;
+            height: clamp(200px, 25%, 400px);
+        }
         div#messages {
             width: 100%;
             flex: 1;
@@ -47,10 +52,22 @@
             background-color: #fff;
             padding: 8px;
         }
-        div.user > span, div.question > span {
+        div.user, div.question {
+            display: flex;
+            width: 100%;
+        }
+        div.user > div.label, div.question > div.label {
             display: inline-block;
             width: 100px;
         }
+        #u {
+            flex: 1;
+        }
+        #q {
+            width: 100%;
+            height: clamp(100px, 20%, 400px);
+        }
+
     </style>
 </head>
 <body>
@@ -58,22 +75,25 @@
     <div class="title">智能助理</div>
     <div><a href="javascript:history.go(-1)">返回</a></div>
     <div class="user">
-        <span>您的名字：</span>
+        <div id="username" class="label">您的名字：</div>
         <input id="u" value="anonymous"/>
     </div>
-    <div class="question">
-        <span>问题：</span>
-        <input id="q" value="请问如何办理上海市的居住证？"/>
-        <button id="ask-button">提交</button>
-    </div>
+    <textarea id="q">请问如何办理上海市的居住证？</textarea>
+    <button id="ask-button">提交</button>
     <div id="messages">
     </div>
 </div>
 <script>
+    document.onload = () => {
+        document.querySelector("#username").innerText = "用户" + new Date().getTime();
+    };
+
     function addMessageDiv(message) {
         const messageDiv = document.createElement("div");
         messageDiv.innerText = message;
-        document.querySelector("#messages").appendChild(messageDiv);
+        const messagesDiv = document.querySelector("#messages");
+        messagesDiv.appendChild(messageDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
         return messageDiv;
     }
 
@@ -110,6 +130,7 @@
             button.innerText = '提交';
         }
     });
+
 
 </script>
 </body>
