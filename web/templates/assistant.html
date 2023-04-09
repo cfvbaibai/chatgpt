@@ -68,6 +68,8 @@
             height: clamp(100px, 20%, 400px);
         }
 
+
+
     </style>
 </head>
 <body>
@@ -75,7 +77,7 @@
     <div class="title">智能助理</div>
     <div><a href="javascript:history.go(-1)">返回</a></div>
     <div class="user">
-        <div id="username" class="label">您的名字：</div>
+        <div class="label">您的名字：</div>
         <input id="u" value="anonymous"/>
     </div>
     <textarea id="q">请问如何办理上海市的居住证？</textarea>
@@ -84,9 +86,9 @@
     </div>
 </div>
 <script>
-    document.onload = () => {
-        document.querySelector("#username").innerText = "用户" + new Date().getTime();
-    };
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelector("#u").value = "用户" + new Date().getTime();
+    });
 
     function addMessageDiv(message) {
         const messageDiv = document.createElement("div");
@@ -130,6 +132,8 @@
             button.innerText = '提交';
         }
     });
+
+
 
 
 </script>
