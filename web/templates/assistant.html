@@ -68,9 +68,14 @@
             width: 100%;
             height: clamp(100px, 20%, 400px);
         }
-
-
-
+        div.button-row {
+            display: flex;
+            width: 100%;
+            gap: 8px;
+        }
+        div.button-row > button {
+            flex: 1;
+        }
     </style>
 </head>
 <body>
@@ -81,13 +86,19 @@
         <div><a href="javascript:history.go(-1)">返回</a></div>
     </div>
     <textarea id="q">请问如何办理上海市的居住证？</textarea>
-    <button id="ask-button">提交</button>
+    <div class="button-row">
+        <button id="ask-button">提交</button>
+        <button id="reset-button">重置</button>
+    </div>
     <div id="messages">
     </div>
 </div>
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
+    function resetUser() {
         document.querySelector("#u").value = "用户" + new Date().getTime();
+    }
+    document.addEventListener("DOMContentLoaded", () => {
+        resetUser();
     });
 
     function addMessageDiv(message) {
@@ -99,6 +110,14 @@
         return messageDiv;
     }
 
+    document.querySelector("#reset-button").addEventListener("click", () => {
+        resetUser();
+        const messagesDiv = document.querySelector("#messages");
+        while (messagesDiv.firstChild) {
+            messagesDiv.removeChild(messagesDiv.firstChild);
+        }
+    });
+
     document.querySelector("#ask-button").addEventListener("click", async () => {
         const key = document.querySelector("#u").value;
         const q = document.querySelector("#q").value;
@@ -107,6 +126,8 @@
         const button = document.querySelector("#ask-button");
         button.disabled = true;
         button.innerText = '正在提交……';
+        const resetButton = document.querySelector("#reset-button");
+        resetButton.disabled = true;
         const answerDiv = addMessageDiv("智能助手正在查找资料，可能会花费数十秒钟，请耐心等待……");
         answerDiv.style.color = "#999";
         try {
@@ -124,18 +145,21 @@
             const answer = responseObj.data.final_a;
             answerDiv.innerText = "答：" + answer;
             answerDiv.style.color = "inherit";
+            const overflow = responseObj.data.overflow;
+            if (overflow) {
+                const warningDiv = addMessageDiv(
+                    "当前对话长度已超过极限，智能助手将会遗忘部分早期对话。您也可以点击“重置”按钮重置对话。");
+                warningDiv.style.color = "#FAAD14";
+            }
         } catch (e) {
             answerDiv.innerText = "错误：" + e.message;
             answerDiv.style.color = "red";
         } finally {
             button.disabled = false;
             button.innerText = '提交';
+            resetButton.disabled = false;
         }
     });
-
-
-
-
 </script>
 </body>
 </html>

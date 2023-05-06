@@ -10,6 +10,7 @@ SESSION_ASSISTANT_DIALOG = "assistant_dialog"
 
 @app.errorhandler(Exception)
 def handle_exception(e):
+    print(e)
     return {"error": str(e)}
 
 
@@ -36,8 +37,10 @@ def api_assistant_ask():
         return {"error": "no key specified"}
     key = payload["key"]
     if key not in dialogs:
+        # role = "你是上海仁力名才公司的一位人力资源专家"
+        print("Key ", key, " not found! Setup a new dialog")
         dialogs[key] = Dialog()
-        dialogs[key].set_cpu_role("你是上海仁力名才公司的一位人力资源专家")
+        # dialogs[key].set_cpu_role(role)
     dialog = dialogs[key]
     answer = dialog.ask(q)
     return {"data": {**answer}}

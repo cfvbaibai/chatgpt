@@ -38,6 +38,7 @@ def calc_embeddings(df):
 
 class Dialog:
     messages = []
+    token_counts = []
 
     @staticmethod
     def _get_most_similar_qa(question):
@@ -61,13 +62,27 @@ class Dialog:
         print(prompt)
         return prompt
 
+    def _get_total_token_counts(self):
+        return sum(self.token_counts)
+
     def set_cpu_role(self, message):
         self.messages = [item for item in self.messages if item["role"] != "system"]
         self.messages.insert(0, {"role": "system", "content": message})
+        self._print_state("set_cpu_role")
+
+    def _print_state(self, title):
+        print("========", title, "========")
+        print("total token count: ", self._get_total_token_counts())
+        print("messages count: ", len(self.messages))
+        print("token_counts: ", str(self.token_counts))
+        print("===================================")
 
     def ask(self, question):
         best_q, best_a, similarity = Dialog._get_most_similar_qa(question)
+        total_tokens = 0
         if similarity > 0.925:
+            self.messages.append({"role": "user", "content": question})
+            self.token_counts.append(0)
             answer = best_a
         else:
             prompt = Dialog._get_prompt_by_best_qa(question, best_q, best_a, similarity)
@@ -76,6 +91,19 @@ class Dialog:
                 model=CHAT_COMPLETION_MODEL,
                 messages=self.messages
             )
+            total_tokens = result.usage.total_tokens
+            self.token_counts.append(total_tokens - self._get_total_token_counts())
+            print(result)
             answer = result.choices[0]["message"]["content"]
         self.messages.append({"role": "assistant", "content": answer})
-        return {"final_a": answer, "best_q": best_q, "best_a": best_a, "similarity": similarity}
+        self._print_state("THIS ROUND")
+
+        overflow = total_tokens >= 4097
+        if overflow:
+            while self._get_total_token_counts() >= 2048:
+                self.messages.pop(0)
+                self.messages.pop(0)
+                self.token_counts.pop(0)
+                self._print_state("AFTER CUT")
+
+        return {"final_a": answer, "best_q": best_q, "best_a": best_a, "similarity": similarity, "overflow": overflow}
