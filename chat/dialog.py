@@ -37,7 +37,7 @@ def calc_embeddings(df):
 
 
 class Dialog:
-@staticmethod
+    @staticmethod
     def _get_most_similar_qa(question):
         q_embedding = get_embedding(question)
         df = df_qa.copy()
