@@ -37,10 +37,7 @@ def calc_embeddings(df):
 
 
 class Dialog:
-    messages = []
-    token_counts = []
-
-    @staticmethod
+@staticmethod
     def _get_most_similar_qa(question):
         q_embedding = get_embedding(question)
         df = df_qa.copy()
@@ -61,6 +58,10 @@ class Dialog:
         prompt = "\n".join(lines)
         print(prompt)
         return prompt
+
+    def __init__(self):
+        self.messages = []
+        self.token_counts = []
 
     def _get_total_token_counts(self):
         return sum(self.token_counts)
