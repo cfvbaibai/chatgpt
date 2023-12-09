@@ -4,21 +4,24 @@ import numpy as np
 import openai
 import pandas as pd
 from numpy import ndarray
+from openai import OpenAI
 
 CHAT_COMPLETION_MODEL = "gpt-3.5-turbo"
 COMPLETIONS_MODEL = 'text-davinci-003'
 EMBEDDING_MODEL = "text-embedding-ada-002"
+
+client = OpenAI()
 
 df_qa = pd.read_csv('data/md_QA_embedded.csv')
 df_qa['embedding'] = df_qa['embedding'].apply(lambda x: json.loads(x))
 
 
 def get_embedding(text: str, model: str = EMBEDDING_MODEL) -> list[float]:
-    result = openai.Embedding.create(
+    result = client.embeddings.create(
         model=model,
         input=text
     )
-    return result["data"][0]["embedding"]
+    return result.data[0].embedding
 
 
 def vector_similarity(x: list[float], y: list[float]) -> ndarray:
@@ -88,14 +91,14 @@ class Dialog:
         else:
             prompt = Dialog._get_prompt_by_best_qa(question, best_q, best_a, similarity)
             self.messages.append({"role": "user", "content": prompt})
-            result = openai.ChatCompletion.create(
+            result = client.chat.completions.create(
                 model=CHAT_COMPLETION_MODEL,
                 messages=self.messages
             )
             total_tokens = result.usage.total_tokens
             self.token_counts.append(total_tokens - self._get_total_token_counts())
             print(result)
-            answer = result.choices[0]["message"]["content"]
+            answer = result.choices[0].message.content
         self.messages.append({"role": "assistant", "content": answer})
         self._print_state("THIS ROUND")
 
